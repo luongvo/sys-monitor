@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+	<bean id="dailyStatisticReportTask" class="com.cominit.demo.sys_monitor.job.task.DailyStatisticReportTask" />
+
+	<bean name="dailyStatisticReportJob" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.cominit.demo.sys_monitor.job.DailyStatisticReportJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="dailyStatisticReportTask" value-ref="dailyStatisticReportTask" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+	</bean>
+
+	<!-- timezone bean: UTC+1 Germany -->
+	<bean id="timeZoneUTC1" class="java.util.TimeZone" factory-method="getTimeZone">
+	   <constructor-arg value="Europe/Berlin"/>
+	</bean>
+
+	<!-- Send statistic report every day at 5AM UTC+1 -->
+	<bean id="dailyStatisticReportTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="dailyStatisticReportJob" />
+		<property name="cronExpression" value="0 0 5 * * ?" />
+		<property name="timeZone" ref="timeZoneUTC1" />
+	</bean>
+
+	<bean id="simpleTrigger" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+		<property name="jobDetail" ref="dailyStatisticReportJob" />
+		<property name="repeatInterval" value="300000" />
+		<property name="startDelay" value="1000" />
+	</bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="jobDetails">
+			<list>
+				<ref bean="dailyStatisticReportJob" />
+			</list>
+		</property>
+
+		<property name="triggers">
+			<list>
+<!-- 				<ref bean="dailyStatisticReportTrigger" /> -->
+				<ref bean="simpleTrigger" />
+			</list>
+		</property>
+	</bean>
+
+</beans>

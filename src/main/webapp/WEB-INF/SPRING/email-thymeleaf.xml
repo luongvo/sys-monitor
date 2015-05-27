@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- Email support -->
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="session">
+			<ref bean="mailSession"></ref>
+		</property>
+	</bean>
+
+	<bean id="mailSession" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>java:jboss/mail/Default</value>
+		</property>
+	</bean>
+
+	<!-- THYMELEAF: Template Resolver for email templates -->
+	<beans:bean id="emailTemplateResolver"
+		class="org.thymeleaf.templateresolver.ClassLoaderTemplateResolver">
+		<beans:property name="prefix" value="mailTemplate/" />
+		<beans:property name="templateMode" value="HTML5" />
+		<beans:property name="characterEncoding" value="UTF-8" />
+		<beans:property name="order" value="1" />
+		<!-- Template cache is true by default. Set to false if you want -->
+		<!-- templates to be automatically updated when modified. -->
+		<beans:property name="cacheable" value="true" />
+	</beans:bean>
+
+
+	<!-- THYMELEAF: Template Engine (Spring3-specific version) -->
+	<beans:bean id="templateEngine" class="org.thymeleaf.spring3.SpringTemplateEngine">
+		<beans:property name="templateResolvers">
+			<beans:set>
+				<beans:ref bean="emailTemplateResolver" />
+			</beans:set>
+		</beans:property>
+	</beans:bean>
+
+</beans>

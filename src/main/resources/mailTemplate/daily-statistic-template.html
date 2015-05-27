@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title th:remove="all">Template for HTML email</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+	<p>Dear Admin,</p>
+	<p>
+		The Monitoring System has detected <b><span th:text="${count}"></span> attack times</b> (from out-side systems) within last 24hrs in the list below:
+	</p>
+	<table border="1">
+		<tr>
+			<th style="width: 400px">IP</th>
+			<th style="width: 150px">STATUS</th>
+		</tr>
+		<tr th:each="attack: ${attacks}">
+			<td style="width: 400px"><span th:text="${attack.ip}"></span></td>
+			<td style="width: 150px"><span th:text="${attack.status}"></span></td>
+		</tr>
+	</table>
+
+	<p>
+		Regards, <br /><em>Cominit Monitoring System</em>
+	</p>
+</body>
+</html>
